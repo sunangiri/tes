@@ -1,15 +1,6 @@
 version: 2.1
 
 jobs:
-  lint-frontend-dockerfile:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: docker pull hadolint/hadolint
-      - run: docker run --rm -i hadolint/hadolint < karsajobs-ui/Dockerfile
-
   lint-backend-dockerfile:
     docker:
       - image: cimg/base:stable
@@ -43,7 +34,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: docker build -t risqikhoirul/karsajobs:latest ./karsajobs-backend
+      - run: docker build -t risqikhoirul/karsajobs:latest ./karsajobs
       - run: docker tag risqikhoirul/karsajobs:latest ghcr.io/risqikhoirul/karsajobs:latest
       - run: echo $GITHUB_TOKEN | docker login ghcr.io -u lionelritchie29 --password-stdin
       - run: docker push ghcr.io/risqikhoirul/karsajobs:latest
