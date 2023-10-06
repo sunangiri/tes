@@ -1,0 +1,44 @@
+version: 2.1
+
+jobs:
+  # Job untuk melakukan linting terhadap Dockerfile
+  lint-dockerfile:
+    docker:
+      - image: hadolint/hadolint:latest
+    steps:
+      - checkout
+      - run: hadolint backend/Dockerfile
+
+  # Job untuk menjalankan unit test pada backend
+  test-app:
+    docker:
+      - image: golang:1.16
+    steps:
+      - checkout
+      - run: go test -v -short --count=1 $(go list ./...)
+
+  # Job untuk build dan push Docker image backend
+  build-app-karsajobs:
+    docker:
+      - image: docker:latest
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build dan push Docker image
+          command: |
+            docker build -t $DOCKER_USERNAME/karsajobs:latest backend/
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+            docker push $DOCKER_USERNAME/karsajobs:latest
+
+workflows:
+  version: 2
+  # Workflow untuk branch karsajobs
+  karsajobs-ci:
+    jobs:
+      - lint-dockerfile
+      - test-app
+      - build-app-karsajobs:
+          requires:
+            - test-app
+
