@@ -1,33 +1,43 @@
 version: 2.1
 
 jobs:
-  # Job untuk melakukan linting terhadap Dockerfile frontend
-  lint-dockerfile:
+  # Job untuk melakukan linting terhadap Dockerfile pada direktori karsajobs-ui
+  lint-frontend-dockerfile:
     docker:
-      - image: hadolint/hadolint:latest
-    steps:
-      - checkout
-      - run: hadolint frontend/Dockerfile
-
-  # Job untuk build dan push Docker image frontend
-  build-app-karsajobs-ui:
-    docker:
-      - image: docker:latest
+      - image: cimg/base:stable
     steps:
       - checkout
       - setup_remote_docker
-      - run:
-          name: Build dan push Docker image
-          command: |
-            docker build -t $DOCKER_USERNAME/karsajobs-ui:latest frontend/
-            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-            docker push $DOCKER_USERNAME/karsajobs-ui:latest
+      - run: docker pull hadolint/hadolint
+      - run: docker run --rm -i hadolint/hadolint < Dockerfile
+
+  # Job untuk menjalankan test pada aplikasi frontend
+  test-frontend:
+    docker:
+      - image: cimg/node:14.17.3
+    steps:
+      - checkout
+      - run: cd karsajobs-ui && npm install && npm test
+
+  # Job untuk membangun dan mendorong image Docker untuk aplikasi frontend
+  build-app-karsajobs-ui:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker build -t risqikhoirul/karsajobs-ui:latest .
+      - run: docker tag risqikhoirul/karsajobs-ui:latest ghcr.io/risqikhoirul/karsajobs-ui:latest
+      - run: echo $GITHUB_TOKEN | docker login ghcr.io -u risqikhoirul --password-stdin
+      - run: docker push ghcr.io/risqikhoirul/karsajobs-ui:latest
 
 workflows:
-  version: 2
-  # Workflow untuk branch karsajobs-ui
-  karsajobs-ui-ci:
+  frontend-workflows:
     jobs:
-      - lint-dockerfile
-      - build-app-karsajobs-ui
-
+      - lint-frontend-dockerfile
+      - test-frontend:
+          requires:
+            - lint-frontend-dockerfile
+      - build-app-karsajobs-ui:
+          requires:
+            - test-frontend
