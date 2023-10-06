@@ -8,7 +8,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: docker pull hadolint/hadolint
-      - run: docker run --rm -i hadolint/hadolint < karsajobs-ui/Dockerfile
+      - run: docker run --rm -i hadolint/hadolint < Dockerfile
 
   lint-backend-dockerfile:
     docker:
@@ -25,7 +25,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: docker build -t risqikhoirul/karsajobs-ui:latest ./karsajobs-ui
+      - run: docker build -t risqikhoirul/karsajobs-ui:latest .
       - run: docker tag risqikhoirul/karsajobs-ui:latest ghcr.io/risqikhoirul/karsajobs-ui:latest
       - run: echo $GITHUB_TOKEN | docker login ghcr.io -u lionelritchie29 --password-stdin
       - run: docker push ghcr.io/risqikhoirul/karsajobs-ui:latest
@@ -43,7 +43,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: docker build -t risqikhoirul/karsajobs:latest ./karsajobs
+      - run: docker build -t risqikhoirul/karsajobs:latest .
       - run: docker tag risqikhoirul/karsajobs:latest ghcr.io/risqikhoirul/karsajobs:latest
       - run: echo $GITHUB_TOKEN | docker login ghcr.io -u lionelritchie29 --password-stdin
       - run: docker push ghcr.io/risqikhoirul/karsajobs:latest
