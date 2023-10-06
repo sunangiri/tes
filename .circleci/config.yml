@@ -17,7 +17,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: docker pull hadolint/hadolint
-      - run: docker run --rm -i hadolint/hadolint < karsajobs/Dockerfile
+      - run: docker run --rm -i hadolint/hadolint < Dockerfile
 
   build-app-karsajobs-ui:
     docker:
