@@ -1,5 +1,5 @@
-# Gunakan Node.js versi 18 dengan Alpine Linux sebagai gambar dasar
-FROM node:18-alpine
+# Gunakan Node.js versi 14
+FROM node:14
 
 # Setel direktori kerja di dalam kontainer ke /src
 WORKDIR /src
