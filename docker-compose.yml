@@ -1,0 +1,20 @@
+version: "2"
+
+services:
+  # Service for the item-app application
+  item-app:
+    image: ghcr.io/risqikhoirul/item-app:v1
+    ports:
+      - "80:8080" # Map port 80 on the host to port 8080 in the container
+    depends_on:
+      - item-db # Ensure that "item-db" is running before starting "item-app"
+    restart: always # Set the container restart policy to always
+
+  # Service for the item-db database
+  item-db:
+    image: mongo:3
+    volumes:
+      - app-db:/data/db # Use the "app-db" volume to store database data
+
+volumes:
+  app-db: # Define the "app-db" volume
